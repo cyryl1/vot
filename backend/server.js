@@ -40,16 +40,13 @@ app.use(
 // Serve static uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Serve frontend static files
-app.use(express.static(path.join(__dirname, '../frontend')));
-
 // Routes
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/voters', require('./routes/voterRoutes'));
 
-// Fallback for SPA or unknown routes (serve index.html)
-app.get(/^(.*)$/, (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+// Simple root route for Vercel deployment check
+app.get('/', (req, res) => {
+  res.json({ message: 'VOT API is running on Vercel!' });
 });
 
 // Error handling middleware
