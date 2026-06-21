@@ -14,7 +14,11 @@ connectDB().then(() => {
 const app = express();
 
 // Middleware
-app.use(cors());
+app.set('trust proxy', 1);
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -28,6 +32,7 @@ app.use(
       maxAge: 1000 * 60 * 60 * 24, // 1 day
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
     },
   })
 );
