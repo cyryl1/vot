@@ -46,6 +46,12 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+#root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -267,7 +273,11 @@ header h1 {
 /* Specific Layouts */
 .auth-container {
   max-width: 450px;
-  margin: 4rem auto;
+  width: 100%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .auth-header {
@@ -277,8 +287,7 @@ header h1 {
 
 @media (max-width: 640px) {
   .auth-container {
-    margin: 2rem auto;
-    padding: 0 1rem;
+    padding: 1rem;
   }
 }
 
