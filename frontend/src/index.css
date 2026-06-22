@@ -113,6 +113,7 @@ label {
 input[type="text"],
 input[type="password"],
 input[type="number"],
+input[type="datetime-local"],
 select,
 textarea {
   width: 100%;
@@ -125,6 +126,14 @@ textarea {
   font-size: 1rem;
   transition: all 0.2s ease;
   box-shadow: var(--shadow-sm);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="datetime-local"] {
+  min-height: 48px;
+  background-color: var(--card-bg);
+  display: block;
 }
 
 input:focus, select:focus, textarea:focus {
@@ -321,12 +330,11 @@ header h1 {
   width: 100%;
 }
 
-/* Mobile Dashboard Magic */
+/* Mobile Dashboard Magic - Slide-in Sidebar */
 @media (max-width: 850px) {
   .dashboard-container {
     flex-direction: column;
     padding: 1rem;
-    padding-bottom: 5.5rem; /* Space for fixed bottom nav */
     gap: 1rem;
   }
 
@@ -340,49 +348,70 @@ header h1 {
   }
 
   .sidebar {
-    width: 100%;
     position: fixed;
-    bottom: 0;
+    top: 0;
     left: 0;
-    right: 0;
-    z-index: 100;
+    bottom: 0;
+    width: 280px;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
   }
 
   .sidebar .glass-card {
-    display: flex;
-    flex-direction: row;
-    overflow-x: auto;
-    white-space: nowrap;
-    padding: 0.75rem 1rem !important;
-    border-radius: 16px 16px 0 0;
-    border-bottom: none;
-    border-left: none;
-    border-right: none;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
-    -webkit-overflow-scrolling: touch;
-    gap: 0.5rem;
-    align-items: center;
-  }
-
-  /* Hide scrollbar for clean horizontal nav */
-  .sidebar .glass-card::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .sidebar h2 {
-    display: none;
-  }
-
-  .sidebar hr {
-    display: none;
+    height: 100%;
+    border-radius: 0;
+    border: none;
+    border-right: 1px solid var(--border-color);
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+    overflow-y: auto;
   }
 
   .nav-item {
-    flex: 0 0 auto;
-    padding: 0.6rem 1.2rem;
-    margin-bottom: 0;
-    font-size: 0.95rem;
-    border-radius: 20px;
+    font-size: 1.05rem;
+    padding: 0.875rem 1.25rem;
+  }
+}
+
+/* Sidebar Overlay */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.4);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.sidebar-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Mobile Header for Hamburger */
+.mobile-header {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 850px) {
+  .mobile-header {
+    display: flex;
   }
 }
 

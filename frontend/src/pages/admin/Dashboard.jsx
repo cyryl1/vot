@@ -35,6 +35,7 @@ const TABS = [
 
 function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [checking, setChecking] = useState(true);
   const navigate = useNavigate();
   const { electionId } = useParams();
@@ -72,16 +73,38 @@ function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <aside className="sidebar">
+      {/* Mobile Header */}
+      <div className="mobile-header">
+        <h2 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--primary-color)' }}>Admin Panel</h2>
+        <button 
+          onClick={() => setIsSidebarOpen(true)} 
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', color: 'var(--text-main)' }}
+        >
+          <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div className={`sidebar-overlay ${isSidebarOpen ? 'open' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
+
+      <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="glass-card" style={{ padding: '1.5rem 1rem' }}>
-          <h2 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', textAlign: 'center', color: 'var(--primary-color)' }}>
-            Admin Panel
-          </h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h2 style={{ fontSize: '1.25rem', margin: 0, color: 'var(--primary-color)' }}>
+              Admin Panel
+            </h2>
+            <button className="close-modal d-md-none" onClick={() => setIsSidebarOpen(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '0 0.5rem', color: 'var(--text-main)' }}>
+              &times;
+            </button>
+          </div>
           {TABS.map(tab => (
             <div
               key={tab.id}
               className={`nav-item${activeTab === tab.id ? ' active' : ''}`}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => { setActiveTab(tab.id); setIsSidebarOpen(false); }}
             >
               {tab.label}
             </div>

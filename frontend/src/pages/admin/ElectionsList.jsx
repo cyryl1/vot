@@ -86,7 +86,7 @@ function ElectionsList() {
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <header style={{ display: 'flex', justifyContent: 'center', padding: '1.25rem 2rem', background: 'var(--card-bg)', borderBottom: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)', position: 'sticky', top: 0, zIndex: 10 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', maxWidth: '1200px' }}>
-          <h1 style={{ margin: 0, fontSize: '1.5rem' }}>Elections Dashboard</h1>
+          <h1 style={{ margin: 0, fontSize: '1.25rem' }}>Elections Dashboard</h1>
           <button className="btn btn-secondary" style={{ width: 'auto', padding: '0.5rem 1rem' }} onClick={handleLogout}>Log Out</button>
         </div>
       </header>
@@ -94,8 +94,8 @@ function ElectionsList() {
       <main className="container" style={{ flex: 1, paddingTop: '3rem' }}>
         {error && <div className="alert alert-error">{error}</div>}
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
-          <h2 style={{ margin: 0, fontSize: '1.75rem' }}>Manage Elections</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <h2 style={{ margin: 0, fontSize: '1.5rem' }}>Manage Elections</h2>
           <button className="btn btn-primary" style={{ width: 'auto' }} onClick={() => setShowCreate(!showCreate)}>
             {showCreate ? 'Cancel' : '+ New Election'}
           </button>
@@ -181,7 +181,7 @@ function ElectionCard({ election, onDelete, onClick }) {
   return (
     <div className="glass-card" style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column' }} onClick={onClick}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <h3 style={{ marginTop: 0, marginBottom: '0.5rem' }}>{election.title}</h3>
+        <h3 style={{ marginTop: 0, marginBottom: '0.5rem', fontSize: '1.1rem' }}>{election.title}</h3>
         <span style={{ 
           padding: '4px 8px', 
           borderRadius: '12px', 
