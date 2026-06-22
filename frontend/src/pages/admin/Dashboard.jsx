@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, useParams } from 'react-router-dom';
 import ConfirmModal from '../../components/ConfirmModal';
 import {
@@ -168,12 +169,35 @@ export function SplashLoader() {
 
 export function ActionMenu({ onEdit, onDelete, editDisabled, deleteDisabled }) {
   const [isOpen, setIsOpen] = useState(false);
+  const buttonRef = useRef(null);
+  const [menuStyle, setMenuStyle] = useState({});
 
   useEffect(() => {
     if (!isOpen) return;
+
+    const updatePosition = () => {
+      if (buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect();
+        setMenuStyle({
+          position: 'fixed',
+          top: rect.bottom + 4 + 'px',
+          right: window.innerWidth - rect.right + 'px',
+        });
+      }
+    };
+
+    updatePosition();
+    window.addEventListener('scroll', updatePosition, true);
+    window.addEventListener('resize', updatePosition);
+
     const close = () => setIsOpen(false);
-    document.addEventListener('click', close);
-    return () => document.removeEventListener('click', close);
+    setTimeout(() => document.addEventListener('click', close), 0);
+    
+    return () => {
+      document.removeEventListener('click', close);
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+    };
   }, [isOpen]);
 
   return (
@@ -183,18 +207,22 @@ export function ActionMenu({ onEdit, onDelete, editDisabled, deleteDisabled }) {
         {onDelete && <button className="btn btn-danger action-btn" onClick={onDelete} disabled={deleteDisabled}>Delete</button>}
       </div>
       <div className="show-on-mobile">
-        <button className="btn btn-secondary action-btn" style={{ padding: '0.25rem 0.75rem', fontWeight: 'bold' }} onClick={() => setIsOpen(!isOpen)}>...</button>
-        {isOpen && (
+        <button 
+          ref={buttonRef}
+          className="btn btn-secondary action-btn" 
+          style={{ padding: '0.25rem 0.75rem', fontWeight: 'bold' }} 
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          ...
+        </button>
+        {isOpen && createPortal(
           <div style={{
-            position: 'absolute',
-            right: 0,
-            top: '100%',
-            marginTop: '0.25rem',
+            ...menuStyle,
             background: 'var(--secondary-surface)',
             border: '1px solid var(--border-color)',
             borderRadius: '6px',
             boxShadow: 'var(--shadow-md)',
-            zIndex: 50,
+            zIndex: 9999,
             display: 'flex',
             flexDirection: 'column',
             minWidth: '100px',
@@ -203,7 +231,7 @@ export function ActionMenu({ onEdit, onDelete, editDisabled, deleteDisabled }) {
             {onEdit && (
               <button 
                 style={{ background: 'transparent', border: 'none', padding: '0.75rem 1rem', textAlign: 'left', color: 'var(--text-main)', cursor: editDisabled ? 'not-allowed' : 'pointer', opacity: editDisabled ? 0.5 : 1, borderBottom: onDelete ? '1px solid var(--border-color)' : 'none', fontSize: '0.9rem' }}
-                onClick={() => { if(!editDisabled) { setIsOpen(false); onEdit(); } }}
+                onClick={(e) => { e.stopPropagation(); if(!editDisabled) { setIsOpen(false); onEdit(); } }}
                 disabled={editDisabled}
               >
                 Edit
@@ -212,13 +240,14 @@ export function ActionMenu({ onEdit, onDelete, editDisabled, deleteDisabled }) {
             {onDelete && (
               <button 
                 style={{ background: 'transparent', border: 'none', padding: '0.75rem 1rem', textAlign: 'left', color: 'var(--danger)', cursor: deleteDisabled ? 'not-allowed' : 'pointer', opacity: deleteDisabled ? 0.5 : 1, fontSize: '0.9rem' }}
-                onClick={() => { if(!deleteDisabled) { setIsOpen(false); onDelete(); } }}
+                onClick={(e) => { e.stopPropagation(); if(!deleteDisabled) { setIsOpen(false); onDelete(); } }}
                 disabled={deleteDisabled}
               >
                 Delete
               </button>
             )}
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     </div>
