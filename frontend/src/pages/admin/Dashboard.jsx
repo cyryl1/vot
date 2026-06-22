@@ -396,6 +396,7 @@ function PositionsTab({ electionId }) {
   const [editOrder, setEditOrder] = useState('');
   const [error, setError] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+  const [showCreate, setShowCreate] = useState(false);
 
   const fetchPositions = useCallback(async () => {
     try {
@@ -415,6 +416,7 @@ function PositionsTab({ electionId }) {
       await createPosition({ election_id: electionId, title: title.trim(), order: Number(order) || 0 });
       setTitle('');
       setOrder('');
+      setShowCreate(false);
       fetchPositions();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create position');
@@ -451,31 +453,50 @@ function PositionsTab({ electionId }) {
 
   return (
     <div>
-      <h2>Award Categories</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <h2 style={{ margin: 0 }}>Award Categories</h2>
+        <button className="btn btn-primary" onClick={() => setShowCreate(true)}>+ Add Category</button>
+      </div>
 
-      {error && <div className="alert alert-error">{error}</div>}
+      {error && !showCreate && <div className="alert alert-error">{error}</div>}
 
-      {/* Create form */}
-      <form onSubmit={handleCreate} style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
-        <input
-          type="text"
-          placeholder="Category title (e.g., Best Dressed)"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-          style={{ flex: '1 1 200px' }}
-          required
-        />
-        <input
-          type="number"
-          placeholder="Order"
-          value={order}
-          onChange={e => setOrder(e.target.value)}
-          style={{ width: '90px' }}
-        />
-        <button className="btn btn-primary" type="submit" style={{ width: 'auto', padding: '0.75rem 1.5rem' }}>
-          Add Category
-        </button>
-      </form>
+      {/* Create Modal */}
+      {showCreate && (
+        <div className="modal-overlay" onClick={() => setShowCreate(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 style={{ marginBottom: 0 }}>Add Category</h2>
+              <span className="close-modal" onClick={() => setShowCreate(false)}>&times;</span>
+            </div>
+            {error && <div className="alert alert-error">{error}</div>}
+            <form onSubmit={handleCreate}>
+              <div className="form-group">
+                <label>Category title (e.g., Best Dressed)</label>
+                <input
+                  type="text"
+                  placeholder="Category title"
+                  value={title}
+                  onChange={e => setTitle(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Order (optional)</label>
+                <input
+                  type="number"
+                  placeholder="Order"
+                  value={order}
+                  onChange={e => setOrder(e.target.value)}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowCreate(false)}>Cancel</button>
+                <button className="btn btn-primary" type="submit">Add Category</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Positions list */}
       <div className="table-container">
@@ -552,6 +573,7 @@ function CandidatesTab({ electionId }) {
   const [editPositionId, setEditPositionId] = useState('');
   const [editImage, setEditImage] = useState(null);
   const [deleteAllConfirm, setDeleteAllConfirm] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -581,6 +603,7 @@ function CandidatesTab({ electionId }) {
       setName('');
       setPositionId('');
       setImage(null);
+      setShowCreate(false);
       fetchData();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create candidate');
@@ -639,36 +662,53 @@ function CandidatesTab({ electionId }) {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <h2 style={{ margin: 0 }}>Nominees</h2>
-        {candidates.length > 0 && (
-          <button className="btn btn-danger" style={{ width: 'auto', padding: '0.5rem 1rem' }} onClick={() => setDeleteAllConfirm(true)}>Delete All Nominees</button>
-        )}
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <button className="btn btn-primary" onClick={() => setShowCreate(true)}>+ Add Nominee</button>
+          {candidates.length > 0 && (
+            <button className="btn btn-danger" onClick={() => setDeleteAllConfirm(true)}>Delete All</button>
+          )}
+        </div>
       </div>
 
-      {error && <div className="alert alert-error">{error}</div>}
+      {error && !showCreate && <div className="alert alert-error">{error}</div>}
 
-      {/* Create form */}
-      <form onSubmit={handleCreate} style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-        <div style={{ flex: '1 1 180px' }}>
-          <label>Name</label>
-          <input type="text" placeholder="Candidate name" value={name} onChange={e => setName(e.target.value)} required />
+      {/* Create Modal */}
+      {showCreate && (
+        <div className="modal-overlay" onClick={() => setShowCreate(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 style={{ marginBottom: 0 }}>Add Nominee</h2>
+              <span className="close-modal" onClick={() => setShowCreate(false)}>&times;</span>
+            </div>
+            {error && <div className="alert alert-error">{error}</div>}
+            <form onSubmit={handleCreate}>
+              <div className="form-group">
+                <label>Name</label>
+                <input type="text" placeholder="Candidate name" value={name} onChange={e => setName(e.target.value)} required />
+              </div>
+              <div className="form-group">
+                <label>Category</label>
+                <select value={positionId} onChange={e => setPositionId(e.target.value)} required>
+                  <option value="">Select category…</option>
+                  {positions.map(p => <option key={p._id} value={p._id}>{p.title}</option>)}
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Photo (optional)</label>
+                <ImageUploader image={image} setImage={setImage} />
+              </div>
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowCreate(false)}>Cancel</button>
+                <button className="btn btn-primary" type="submit" disabled={creating}>
+                  {creating ? 'Adding…' : 'Add Nominee'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-        <div style={{ flex: '1 1 180px' }}>
-          <label>Category</label>
-          <select value={positionId} onChange={e => setPositionId(e.target.value)} required>
-            <option value="">Select category…</option>
-            {positions.map(p => <option key={p._id} value={p._id}>{p.title}</option>)}
-          </select>
-        </div>
-        <div style={{ flex: '1 1 180px' }}>
-          <label>Photo (optional)</label>
-          <ImageUploader image={image} setImage={setImage} />
-        </div>
-        <button className="btn btn-primary" type="submit" style={{ width: 'auto', padding: '0.75rem 1.5rem', alignSelf: 'flex-end' }} disabled={creating}>
-          {creating ? 'Adding…' : 'Add Nominee'}
-        </button>
-      </form>
+      )}
 
       {/* Candidates table */}
       <div className="table-container">
@@ -836,6 +876,7 @@ function VotersTab({ electionId }) {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+  const [showCreate, setShowCreate] = useState(false);
 
   const fetchVoters = useCallback(async () => {
     try {
@@ -855,6 +896,7 @@ function VotersTab({ electionId }) {
     try {
       await createVoter(electionId, singleName.trim());
       setSingleName('');
+      setShowCreate(false);
       setSuccess('Voter added successfully');
       fetchVoters();
     } catch (err) {
@@ -872,6 +914,7 @@ function VotersTab({ electionId }) {
     try {
       const res = await createBulkVoters(electionId, names);
       setBulkNames('');
+      setShowCreate(false);
       setSuccess(res.data.message);
       fetchVoters();
     } catch (err) {
@@ -900,53 +943,77 @@ function VotersTab({ electionId }) {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '1rem' }}>
-        <h2>Voter Registry</h2>
-        <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-          {votedCount} of {voters.length} voted
-        </span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <h2 style={{ margin: 0 }}>Voter Registry</h2>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+            {votedCount} of {voters.length} voted
+          </span>
+        </div>
+        <button className="btn btn-primary" onClick={() => setShowCreate(true)}>+ Add Voters</button>
       </div>
 
-      {error && <div className="alert alert-error">{error}</div>}
-      {success && <div className="alert alert-success">{success}</div>}
+      {error && !showCreate && <div className="alert alert-error">{error}</div>}
+      {success && !showCreate && <div className="alert alert-success">{success}</div>}
 
-      {/* Single add */}
-      <form onSubmit={handleAddSingle} style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem' }}>
-        <input
-          type="text"
-          placeholder="Enter voter's full name"
-          value={singleName}
-          onChange={e => setSingleName(e.target.value)}
-          style={{ flex: 1 }}
-          required
-        />
-        <button className="btn btn-primary" type="submit" style={{ width: 'auto', padding: '0.75rem 1.5rem' }}>
-          Add Voter
-        </button>
-      </form>
+      {/* Create Modal */}
+      {showCreate && (
+        <div className="modal-overlay" onClick={() => setShowCreate(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 style={{ marginBottom: 0 }}>Add Voters</h2>
+              <span className="close-modal" onClick={() => setShowCreate(false)}>&times;</span>
+            </div>
+            {error && <div className="alert alert-error">{error}</div>}
+            
+            <div style={{ marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Single Voter</h3>
+              </div>
+              <form onSubmit={handleAddSingle} style={{ display: 'flex', gap: '0.75rem' }}>
+                <input
+                  type="text"
+                  placeholder="Enter voter's full name"
+                  value={singleName}
+                  onChange={e => setSingleName(e.target.value)}
+                  style={{ flex: 1 }}
+                  required
+                />
+                <button className="btn btn-primary" type="submit" style={{ width: 'auto' }}>Add</button>
+              </form>
+            </div>
 
-      <button
-        className="btn btn-secondary"
-        style={{ width: 'auto', fontSize: '0.85rem', marginBottom: '1.5rem' }}
-        onClick={() => setShowBulk(!showBulk)}
-      >
-        {showBulk ? 'Hide Bulk Add' : 'Bulk Add Voters'}
-      </button>
-
-      {showBulk && (
-        <form onSubmit={handleAddBulk} style={{ marginBottom: '2rem' }}>
-          <label>Paste names (one per line)</label>
-          <textarea
-            rows={6}
-            value={bulkNames}
-            onChange={e => setBulkNames(e.target.value)}
-            placeholder={"John Doe\nJane Smith\nAlex Johnson"}
-            style={{ marginBottom: '0.75rem' }}
-          ></textarea>
-          <button className="btn btn-primary" type="submit" style={{ width: 'auto' }}>
-            Add All Voters
-          </button>
-        </form>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Bulk Import</h3>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  style={{ width: 'auto', fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
+                  onClick={() => setShowBulk(!showBulk)}
+                >
+                  {showBulk ? 'Hide' : 'Show'}
+                </button>
+              </div>
+              
+              {showBulk && (
+                <form onSubmit={handleAddBulk}>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Paste names (one per line)</p>
+                  <textarea
+                    rows={6}
+                    value={bulkNames}
+                    onChange={e => setBulkNames(e.target.value)}
+                    placeholder={"John Doe\nJane Smith\nAlex Johnson"}
+                    style={{ marginBottom: '1rem' }}
+                  ></textarea>
+                  <button className="btn btn-primary" type="submit" style={{ width: '100%' }}>
+                    Import All Voters
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Voter table */}
@@ -1005,6 +1072,7 @@ function AdminsTab() {
   const [newUsername, setNewUsername] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [deleteId, setDeleteId] = useState(null);
+  const [showCreate, setShowCreate] = useState(false);
 
   const fetchAdmins = useCallback(async () => {
     try {
@@ -1028,6 +1096,7 @@ function AdminsTab() {
       await createAdmin({ username: newUsername.trim(), password: newPassword });
       setNewUsername('');
       setNewPassword('');
+      setShowCreate(false);
       fetchAdmins();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create administrator');
@@ -1050,35 +1119,53 @@ function AdminsTab() {
 
   return (
     <div>
-      <h2>Administrators</h2>
-      {error && <div className="alert alert-error">{error}</div>}
-
-      <div className="glass-card" style={{ marginBottom: '2rem' }}>
-        <h3 style={{ marginTop: 0 }}>Add Administrator</h3>
-        <form onSubmit={handleCreate} style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <div style={{ flex: 1, minWidth: '200px' }}>
-            <input
-              type="text"
-              placeholder="Username"
-              value={newUsername}
-              onChange={(e) => setNewUsername(e.target.value)}
-              required
-            />
-          </div>
-          <div style={{ flex: 1, minWidth: '200px' }}>
-            <input
-              type="password"
-              placeholder="Password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              required
-            />
-          </div>
-          <button type="submit" className="btn btn-primary" disabled={!newUsername.trim() || !newPassword.trim()}>
-            Add Admin
-          </button>
-        </form>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <h2 style={{ margin: 0 }}>Administrators</h2>
+        <button className="btn btn-primary" onClick={() => setShowCreate(true)}>+ Add Administrator</button>
       </div>
+      
+      {error && !showCreate && <div className="alert alert-error">{error}</div>}
+
+      {/* Create Modal */}
+      {showCreate && (
+        <div className="modal-overlay" onClick={() => setShowCreate(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 style={{ marginBottom: 0 }}>Add Administrator</h2>
+              <span className="close-modal" onClick={() => setShowCreate(false)}>&times;</span>
+            </div>
+            {error && <div className="alert alert-error">{error}</div>}
+            <form onSubmit={handleCreate}>
+              <div className="form-group">
+                <label>Username</label>
+                <input
+                  type="text"
+                  placeholder="Username"
+                  value={newUsername}
+                  onChange={(e) => setNewUsername(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Password</label>
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowCreate(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary" disabled={!newUsername.trim() || !newPassword.trim()}>
+                  Add Admin
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <div className="table-container">
         <table>
