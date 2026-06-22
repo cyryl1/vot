@@ -398,6 +398,9 @@ header h1 {
   .hide-on-mobile {
     display: none !important;
   }
+  .show-on-mobile {
+    display: inline-block !important;
+  }
 }
 
 /* Sidebar Overlay */
@@ -720,3 +723,4 @@ a {
 a:hover {
   color: var(--primary-hover);
 }
+.show-on-mobile { display: none !important; }

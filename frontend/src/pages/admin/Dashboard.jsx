@@ -166,6 +166,65 @@ export function SplashLoader() {
   );
 }
 
+export function ActionMenu({ onEdit, onDelete, editDisabled, deleteDisabled }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const close = () => setIsOpen(false);
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, [isOpen]);
+
+  return (
+    <div style={{ position: 'relative', display: 'inline-block' }} onClick={e => e.stopPropagation()}>
+      <div className="hide-on-mobile" style={{ display: 'flex', gap: '0.5rem' }}>
+        {onEdit && <button className="btn btn-secondary action-btn" onClick={onEdit} disabled={editDisabled}>Edit</button>}
+        {onDelete && <button className="btn btn-danger action-btn" onClick={onDelete} disabled={deleteDisabled}>Delete</button>}
+      </div>
+      <div className="show-on-mobile">
+        <button className="btn btn-secondary action-btn" style={{ padding: '0.25rem 0.75rem', fontWeight: 'bold' }} onClick={() => setIsOpen(!isOpen)}>...</button>
+        {isOpen && (
+          <div style={{
+            position: 'absolute',
+            right: 0,
+            top: '100%',
+            marginTop: '0.25rem',
+            background: 'var(--secondary-surface)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '6px',
+            boxShadow: 'var(--shadow-md)',
+            zIndex: 50,
+            display: 'flex',
+            flexDirection: 'column',
+            minWidth: '100px',
+            overflow: 'hidden'
+          }}>
+            {onEdit && (
+              <button 
+                style={{ background: 'transparent', border: 'none', padding: '0.75rem 1rem', textAlign: 'left', color: 'var(--text-main)', cursor: editDisabled ? 'not-allowed' : 'pointer', opacity: editDisabled ? 0.5 : 1, borderBottom: onDelete ? '1px solid var(--border-color)' : 'none', fontSize: '0.9rem' }}
+                onClick={() => { if(!editDisabled) { setIsOpen(false); onEdit(); } }}
+                disabled={editDisabled}
+              >
+                Edit
+              </button>
+            )}
+            {onDelete && (
+              <button 
+                style={{ background: 'transparent', border: 'none', padding: '0.75rem 1rem', textAlign: 'left', color: 'var(--danger)', cursor: deleteDisabled ? 'not-allowed' : 'pointer', opacity: deleteDisabled ? 0.5 : 1, fontSize: '0.9rem' }}
+                onClick={() => { if(!deleteDisabled) { setIsOpen(false); onDelete(); } }}
+                disabled={deleteDisabled}
+              >
+                Delete
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /* ==================== OVERVIEW TAB ==================== */
 function OverviewTab({ electionId }) {
   const [stats, setStats] = useState(null);
@@ -554,10 +613,10 @@ function PositionsTab({ electionId }) {
                       <button className="btn btn-secondary action-btn" onClick={() => setEditId(null)}>Cancel</button>
                     </>
                   ) : (
-                    <>
-                      <button className="btn btn-secondary action-btn" onClick={() => { setEditId(pos._id); setEditTitle(pos.title); setEditOrder(pos.order); }}>Edit</button>
-                      <button className="btn btn-danger action-btn" onClick={() => handleDelete(pos._id)}>Delete</button>
-                    </>
+                    <ActionMenu 
+                      onEdit={() => { setEditId(pos._id); setEditTitle(pos.title); setEditOrder(pos.order); }}
+                      onDelete={() => handleDelete(pos._id)} 
+                    />
                   )}
                 </td>
               </tr>
@@ -786,10 +845,10 @@ function CandidatesTab({ electionId }) {
                         <button className="btn btn-secondary action-btn" onClick={() => setEditId(null)}>Cancel</button>
                       </>
                     ) : (
-                      <>
-                        <button className="btn btn-secondary action-btn" onClick={() => handleEditClick(c)}>Edit</button>
-                        <button className="btn btn-danger action-btn" onClick={() => handleDelete(c._id)}>Delete</button>
-                      </>
+                      <ActionMenu 
+                        onEdit={() => handleEditClick(c)}
+                        onDelete={() => handleDelete(c._id)} 
+                      />
                     )}
                   </td>
                 </tr>
@@ -1064,9 +1123,10 @@ function VotersTab({ electionId }) {
                   {v.voted_at ? new Date(v.voted_at).toLocaleString() : '—'}
                 </td>
                 <td>
-                  <button className="btn btn-danger action-btn" onClick={() => handleDelete(v._id)} disabled={v.has_voted}>
-                    Delete
-                  </button>
+                  <ActionMenu 
+                    onDelete={() => handleDelete(v._id)} 
+                    deleteDisabled={v.has_voted} 
+                  />
                 </td>
               </tr>
             ))}
@@ -1206,9 +1266,9 @@ function AdminsTab() {
                   {new Date(admin.createdAt).toLocaleString()}
                 </td>
                 <td>
-                  <button className="btn btn-danger action-btn" onClick={() => handleDelete(admin._id)}>
-                    Delete
-                  </button>
+                  <ActionMenu 
+                    onDelete={() => handleDelete(admin._id)} 
+                  />
                 </td>
               </tr>
             ))}
