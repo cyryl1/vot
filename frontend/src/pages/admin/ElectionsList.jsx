@@ -94,14 +94,10 @@ function ElectionsList() {
       <main className="container" style={{ flex: 1, paddingTop: '3rem' }}>
         {error && <div className="alert alert-error">{error}</div>}
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', flexWrap: 'nowrap', gap: '1rem' }}>
-          <h2 style={{ margin: 0, fontSize: '1.5rem' }}>Manage Elections</h2>
-          <button className="btn btn-primary" style={{ width: 'auto', display: 'flex', alignItems: 'center', gap: '0.25rem' }} onClick={() => setShowCreate(!showCreate)}>
-            {showCreate ? (
-              <><span>✕</span><span className="hide-on-mobile"> Cancel</span></>
-            ) : (
-              <><span>+</span><span className="hide-on-mobile"> New Election</span></>
-            )}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', gap: '1rem' }}>
+          <h2 style={{ margin: 0, fontSize: '1.25rem' }}>Manage Elections</h2>
+          <button className="btn btn-primary" style={{ width: 'auto', fontSize: '0.85rem', padding: '0.6rem 1rem', whiteSpace: 'nowrap' }} onClick={() => setShowCreate(!showCreate)}>
+            {showCreate ? 'Cancel' : '+ New Election'}
           </button>
         </div>
 
