@@ -453,9 +453,9 @@ function PositionsTab({ electionId }) {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h2 style={{ margin: 0 }}>Award Categories</h2>
-        <button className="btn btn-primary" onClick={() => setShowCreate(true)}>+ Add Category</button>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'nowrap', gap: '0.5rem' }}>
+        <h2 style={{ margin: 0, fontSize: '1.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Award Categories</h2>
+        <button className="btn btn-primary" style={{ width: 'auto', fontSize: '0.85rem', padding: '0.6rem 1rem', whiteSpace: 'nowrap', flexShrink: 0 }} onClick={() => setShowCreate(true)}>+ Add Category</button>
       </div>
 
       {error && !showCreate && <div className="alert alert-error">{error}</div>}
@@ -662,12 +662,12 @@ function CandidatesTab({ electionId }) {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <h2 style={{ margin: 0 }}>Nominees</h2>
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button className="btn btn-primary" onClick={() => setShowCreate(true)}>+ Add Nominee</button>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'nowrap', gap: '0.5rem' }}>
+        <h2 style={{ margin: 0, fontSize: '1.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Nominees</h2>
+        <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+          <button className="btn btn-primary" style={{ width: 'auto', fontSize: '0.85rem', padding: '0.6rem 1rem', whiteSpace: 'nowrap' }} onClick={() => setShowCreate(true)}>+ Add</button>
           {candidates.length > 0 && (
-            <button className="btn btn-danger" onClick={() => setDeleteAllConfirm(true)}>Delete All</button>
+            <button className="btn btn-danger" style={{ width: 'auto', fontSize: '0.85rem', padding: '0.6rem 1rem', whiteSpace: 'nowrap' }} onClick={() => setDeleteAllConfirm(true)}>Delete All</button>
           )}
         </div>
       </div>
@@ -943,14 +943,14 @@ function VotersTab({ electionId }) {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
-          <h2 style={{ margin: 0 }}>Voter Registry</h2>
-          <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'nowrap', gap: '0.5rem' }}>
+        <div style={{ overflow: 'hidden' }}>
+          <h2 style={{ margin: 0, fontSize: '1.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Voter Registry</h2>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
             {votedCount} of {voters.length} voted
           </span>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowCreate(true)}>+ Add Voters</button>
+        <button className="btn btn-primary" style={{ width: 'auto', fontSize: '0.85rem', padding: '0.6rem 1rem', whiteSpace: 'nowrap', flexShrink: 0 }} onClick={() => setShowCreate(true)}>+ Add Voters</button>
       </div>
 
       {error && !showCreate && <div className="alert alert-error">{error}</div>}
@@ -1119,9 +1119,9 @@ function AdminsTab() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <h2 style={{ margin: 0 }}>Administrators</h2>
-        <button className="btn btn-primary" onClick={() => setShowCreate(true)}>+ Add Administrator</button>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'nowrap', gap: '0.5rem' }}>
+        <h2 style={{ margin: 0, fontSize: '1.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Administrators</h2>
+        <button className="btn btn-primary" style={{ width: 'auto', fontSize: '0.85rem', padding: '0.6rem 1rem', whiteSpace: 'nowrap', flexShrink: 0 }} onClick={() => setShowCreate(true)}>+ Add Admin</button>
       </div>
       
       {error && !showCreate && <div className="alert alert-error">{error}</div>}
