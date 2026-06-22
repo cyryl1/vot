@@ -75,16 +75,20 @@ h1, h2, h3 {
 }
 
 h1 {
-  font-size: 2.25rem;
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
   text-align: center;
-  /* Removed gradient text, just solid clean color */
   color: var(--text-main);
   background: none;
   -webkit-text-fill-color: initial;
 }
 
 h2 {
-  font-size: 1.5rem;
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  color: var(--text-main);
+}
+
+h3 {
+  font-size: clamp(1.1rem, 3vw, 1.35rem);
   color: var(--text-main);
 }
 
@@ -262,6 +266,13 @@ header h1 {
   margin-bottom: 2rem;
 }
 
+@media (max-width: 640px) {
+  .auth-container {
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+}
+
 /* Admin Dashboard Layout */
 .dashboard-container {
   display: flex;
@@ -307,6 +318,72 @@ header h1 {
   padding: 2.5rem;
   min-height: 80vh;
   box-shadow: var(--shadow-md);
+  width: 100%;
+}
+
+/* Mobile Dashboard Magic */
+@media (max-width: 850px) {
+  .dashboard-container {
+    flex-direction: column;
+    padding: 1rem;
+    padding-bottom: 5.5rem; /* Space for fixed bottom nav */
+    gap: 1rem;
+  }
+
+  .main-content {
+    padding: 1.25rem;
+    min-height: auto;
+  }
+
+  .glass-card {
+    padding: 1.25rem;
+  }
+
+  .sidebar {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+  }
+
+  .sidebar .glass-card {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 0.75rem 1rem !important;
+    border-radius: 16px 16px 0 0;
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+    -webkit-overflow-scrolling: touch;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  /* Hide scrollbar for clean horizontal nav */
+  .sidebar .glass-card::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .sidebar h2 {
+    display: none;
+  }
+
+  .sidebar hr {
+    display: none;
+  }
+
+  .nav-item {
+    flex: 0 0 auto;
+    padding: 0.6rem 1.2rem;
+    margin-bottom: 0;
+    font-size: 0.95rem;
+    border-radius: 20px;
+  }
 }
 
 /* Tables */
@@ -370,9 +447,18 @@ tr:hover td {
   padding: 2.5rem;
   border-radius: 16px;
   border: 1px solid var(--border-color);
-  width: 100%;
+  width: 90%;
   max-width: 500px;
   box-shadow: var(--shadow-lg);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@media (max-width: 640px) {
+  .modal-content {
+    padding: 1.5rem;
+    width: 95%;
+  }
 }
 
 .modal-header {
