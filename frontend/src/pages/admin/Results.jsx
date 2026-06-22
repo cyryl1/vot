@@ -42,13 +42,13 @@ function Results() {
 
   return (
     <div className="container" style={{ maxWidth: '960px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h1 style={{ marginBottom: 0 }}>Election Results</h1>
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button className="btn btn-secondary" style={{ width: 'auto' }} onClick={() => navigate(`/admin/elections/${electionId}`)}>
-            ← Dashboard
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'nowrap', gap: '0.5rem' }}>
+        <h1 style={{ margin: 0, fontSize: '1.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Election Results</h1>
+        <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+          <button className="btn btn-secondary" style={{ width: 'auto', fontSize: '0.85rem', padding: '0.6rem 1rem', whiteSpace: 'nowrap' }} onClick={() => navigate(`/admin/elections/${electionId}`)}>
+            &larr; <span className="hide-on-mobile">Dashboard</span>
           </button>
-          <button className="btn btn-danger" style={{ width: 'auto' }} onClick={handleLogout}>
+          <button className="btn btn-danger" style={{ width: 'auto', fontSize: '0.85rem', padding: '0.6rem 1rem', whiteSpace: 'nowrap' }} onClick={handleLogout}>
             Logout
           </button>
         </div>
@@ -68,8 +68,8 @@ function Results() {
 
         return (
           <div key={position._id} className="glass-card" style={{ marginBottom: '1.5rem' }}>
-            <div className="position-title">
-              <h2 style={{ marginBottom: 0 }}>{position.title}</h2>
+            <div className="position-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <h2 style={{ margin: 0, fontSize: '1.1rem' }}>{position.title}</h2>
               <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{totalVotes} total votes</span>
             </div>
 
@@ -134,11 +134,11 @@ function Results() {
 
                     {/* Name + Bar */}
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-                        <span style={{ fontWeight: 600, textTransform: 'capitalize', color: medalStyle.color || 'var(--text-main)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem', gap: '0.5rem', alignItems: 'flex-end' }}>
+                        <span style={{ fontWeight: 600, fontSize: '0.95rem', textTransform: 'capitalize', color: medalStyle.color || 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           {candidate.name}
                         </span>
-                        <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', flexShrink: 0 }}>
+                        <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', flexShrink: 0 }}>
                           {candidate.voteCount} vote{candidate.voteCount !== 1 ? 's' : ''} ({percentage}%)
                         </span>
                       </div>
