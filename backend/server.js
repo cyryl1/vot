@@ -3,13 +3,15 @@ const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+const mongoose = require('mongoose');
 const path = require('path');
 const connectDB = require('./config/db');
 
-// Connect to Database
-connectDB().then(() => {
+// Connect to Database and get Client Promise for MongoStore
+const clientPromise = connectDB().then(() => {
   const { seedDefaultAdmin } = require('./controllers/adminController');
   seedDefaultAdmin();
+  return mongoose.connection.getClient();
 });
 
 const app = express();
@@ -30,7 +32,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URI,
+      clientPromise: clientPromise,
       collectionName: 'sessions'
     }),
     cookie: {
