@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { getElections, createElection, deleteElection, adminCheck, adminLogout } from '../../api';
 import ConfirmModal from '../../components/ConfirmModal';
 
+import { SplashLoader } from './Dashboard';
+
 function ElectionsList() {
   const [elections, setElections] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -79,7 +81,7 @@ function ElectionsList() {
   };
 
   if (loading) {
-    return <div style={{ display: 'flex', justifyContent: 'center', marginTop: '4rem' }}><span className="loader"></span></div>;
+    return <SplashLoader />;
   }
 
   return (

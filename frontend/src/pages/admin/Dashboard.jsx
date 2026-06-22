@@ -144,6 +144,28 @@ function Dashboard() {
   );
 }
 
+export function SplashLoader() {
+  return (
+    <div style={{ minHeight: '60vh', position: 'relative' }}>
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(248, 250, 252, 0.5)',
+        backdropFilter: 'blur(4px)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 9999
+      }}>
+        <span className="loader" style={{ width: '45px', height: '45px', borderWidth: '4px' }}></span>
+      </div>
+    </div>
+  );
+}
+
 /* ==================== OVERVIEW TAB ==================== */
 function OverviewTab({ electionId }) {
   const [stats, setStats] = useState(null);
@@ -229,8 +251,8 @@ function OverviewTab({ electionId }) {
     setTimeout(() => setLinkCopied(false), 2000);
   };
 
-  if (loading) {
-    return <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}><span className="loader" style={{ width: '28px', height: '28px' }}></span></div>;
+  if (loading || !election || !stats) {
+    return <SplashLoader />;
   }
 
   const baseUrl = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
@@ -448,7 +470,7 @@ function PositionsTab({ electionId }) {
   };
 
   if (loading) {
-    return <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}><span className="loader" style={{ width: '28px', height: '28px' }}></span></div>;
+    return <SplashLoader />;
   }
 
   return (
@@ -657,7 +679,7 @@ function CandidatesTab({ electionId }) {
   };
 
   if (loading) {
-    return <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}><span className="loader" style={{ width: '28px', height: '28px' }}></span></div>;
+    return <SplashLoader />;
   }
 
   return (
@@ -936,7 +958,7 @@ function VotersTab({ electionId }) {
   };
 
   if (loading) {
-    return <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}><span className="loader" style={{ width: '28px', height: '28px' }}></span></div>;
+    return <SplashLoader />;
   }
 
   const votedCount = voters.filter(v => v.has_voted).length;
@@ -1115,7 +1137,7 @@ function AdminsTab() {
     }
   };
 
-  if (loading) return <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}><span className="loader" style={{ width: '28px', height: '28px' }}></span></div>;
+  if (loading) return <SplashLoader />;
 
   return (
     <div>

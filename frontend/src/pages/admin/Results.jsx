@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { adminCheck, getResults, adminLogout } from '../../api';
 
+import { SplashLoader } from './Dashboard';
+
 function Results() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,11 +37,7 @@ function Results() {
   };
 
   if (loading) {
-    return (
-      <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-        <span className="loader" style={{ width: '32px', height: '32px' }}></span>
-      </div>
-    );
+    return <SplashLoader />;
   }
 
   return (
