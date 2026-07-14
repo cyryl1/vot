@@ -57,10 +57,9 @@ exports.login = async (req, res) => {
     if (isMatch) {
       req.session.isAdmin = true;
       req.session.adminId = admin._id;
-      req.session.adminUsername = admin.username;
       req.session.role = admin.role || 'superadmin';
       req.session.election_id = admin.election_id;
-      return res.json({ message: 'Login successful' });
+      return res.json({ message: 'Login successful', role: req.session.role, election_id: req.session.election_id });
     }
     return res.status(401).json({ message: 'Invalid credentials' });
   } catch (error) {
@@ -75,7 +74,7 @@ exports.logout = (req, res) => {
 
 exports.checkAuth = (req, res) => {
   if (req.session && req.session.isAdmin) {
-    return res.json({ authenticated: true, username: req.session.adminUsername, role: req.session.role || 'superadmin' });
+    return res.json({ authenticated: true, username: req.session.adminUsername, role: req.session.role || 'superadmin', election_id: req.session.election_id });
   }
   return res.json({ authenticated: false });
 };

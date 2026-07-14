@@ -17,7 +17,11 @@ function AdminLogin() {
       try {
         const res = await adminCheck();
         if (res.data.authenticated) {
-          navigate('/admin/dashboard', { replace: true });
+          if (res.data.role === 'subadmin' && res.data.election_id) {
+            navigate(`/admin/elections/${res.data.election_id}`, { replace: true });
+          } else {
+            navigate('/admin/dashboard', { replace: true });
+          }
         }
       } catch {
         // Not authenticated, stay on login
@@ -36,8 +40,12 @@ function AdminLogin() {
     setError(null);
 
     try {
-      await adminLogin(username.trim(), password);
-      navigate('/admin/dashboard');
+      const res = await adminLogin(username.trim(), password);
+      if (res.data.role === 'subadmin' && res.data.election_id) {
+        navigate(`/admin/elections/${res.data.election_id}`);
+      } else {
+        navigate('/admin/dashboard');
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
