@@ -583,15 +583,23 @@ tr:hover td {
 }
 
 .candidate-img {
-  width: 120px;
-  height: 120px;
+  width: 180px;
+  height: 180px;
   border-radius: 50%;
   object-fit: cover;
-  margin: 0 auto 1rem;
+  margin: 0 auto 1.5rem;
   border: 4px solid var(--secondary-surface);
   background-color: var(--secondary-surface);
   display: block;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+img.candidate-img {
+  cursor: zoom-in;
+}
+
+img.candidate-img:hover {
+  transform: scale(1.05);
 }
 
 .candidate-card:hover .candidate-img {
