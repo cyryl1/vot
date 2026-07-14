@@ -38,6 +38,7 @@ function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [role, setRole] = useState('superadmin');
   const navigate = useNavigate();
   const { electionId } = useParams();
 
@@ -47,6 +48,8 @@ function Dashboard() {
         const res = await adminCheck();
         if (!res.data.authenticated) {
           navigate('/admin/login', { replace: true });
+        } else {
+          setRole(res.data.role);
         }
       } catch {
         navigate('/admin/login', { replace: true });
@@ -101,7 +104,7 @@ function Dashboard() {
               &times;
             </button>
           </div>
-          {TABS.map(tab => (
+          {TABS.filter(t => !(role === 'subadmin' && t.id === 'admins')).map(tab => (
             <div
               key={tab.id}
               className={`nav-item${activeTab === tab.id ? ' active' : ''}`}
@@ -139,7 +142,7 @@ function Dashboard() {
         {activeTab === 'positions' && <PositionsTab electionId={electionId} />}
         {activeTab === 'candidates' && <CandidatesTab electionId={electionId} />}
         {activeTab === 'voters' && <VotersTab electionId={electionId} />}
-        {activeTab === 'admins' && <AdminsTab />}
+        {activeTab === 'admins' && <AdminsTab electionId={electionId} />}
       </main>
     </div>
   );
@@ -1176,12 +1179,13 @@ function VotersTab({ electionId }) {
   );
 }
 
-function AdminsTab() {
+function AdminsTab({ electionId }) {
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [newUsername, setNewUsername] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [newRole, setNewRole] = useState('superadmin');
   const [deleteId, setDeleteId] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
 
@@ -1204,9 +1208,10 @@ function AdminsTab() {
     e.preventDefault();
     if (!newUsername.trim() || !newPassword.trim()) return;
     try {
-      await createAdmin({ username: newUsername.trim(), password: newPassword });
+      await createAdmin({ username: newUsername.trim(), password: newPassword, role: newRole, election_id: electionId });
       setNewUsername('');
       setNewPassword('');
+      setNewRole('superadmin');
       setShowCreate(false);
       fetchAdmins();
     } catch (err) {
@@ -1267,6 +1272,13 @@ function AdminsTab() {
                   required
                 />
               </div>
+              <div className="form-group">
+                <label>Role</label>
+                <select value={newRole} onChange={e => setNewRole(e.target.value)} required>
+                  <option value="superadmin">Superadmin</option>
+                  <option value="subadmin">Subadmin (Restricted to this election)</option>
+                </select>
+              </div>
               <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
                 <button type="button" className="btn btn-secondary" onClick={() => setShowCreate(false)}>Cancel</button>
                 <button type="submit" className="btn btn-primary" disabled={!newUsername.trim() || !newPassword.trim()}>
@@ -1283,6 +1295,7 @@ function AdminsTab() {
           <thead>
             <tr>
               <th>Username</th>
+              <th>Role</th>
               <th>Created At</th>
               <th style={{ width: '100px' }}>Actions</th>
             </tr>
@@ -1291,6 +1304,7 @@ function AdminsTab() {
             {admins.map(admin => (
               <tr key={admin._id}>
                 <td style={{ fontWeight: '500' }}>{admin.username}</td>
+                <td>{admin.role === 'subadmin' ? 'Subadmin' : 'Superadmin'}</td>
                 <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                   {new Date(admin.createdAt).toLocaleString()}
                 </td>

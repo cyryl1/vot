@@ -58,6 +58,8 @@ exports.login = async (req, res) => {
       req.session.isAdmin = true;
       req.session.adminId = admin._id;
       req.session.adminUsername = admin.username;
+      req.session.role = admin.role || 'superadmin';
+      req.session.election_id = admin.election_id;
       return res.json({ message: 'Login successful' });
     }
     return res.status(401).json({ message: 'Invalid credentials' });
@@ -73,13 +75,14 @@ exports.logout = (req, res) => {
 
 exports.checkAuth = (req, res) => {
   if (req.session && req.session.isAdmin) {
-    return res.json({ authenticated: true, username: req.session.adminUsername });
+    return res.json({ authenticated: true, username: req.session.adminUsername, role: req.session.role || 'superadmin' });
   }
   return res.json({ authenticated: false });
 };
 
 exports.getAdmins = async (req, res) => {
   try {
+    if (req.session.role === 'subadmin') return res.status(403).json({ message: 'Forbidden' });
     const admins = await Admin.find().select('-password').sort({ createdAt: 1 });
     res.json(admins);
   } catch (error) {
@@ -89,12 +92,18 @@ exports.getAdmins = async (req, res) => {
 
 exports.createAdmin = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    if (req.session.role === 'subadmin') return res.status(403).json({ message: 'Forbidden' });
+    const { username, password, role, election_id } = req.body;
     if (!username || !password) return res.status(400).json({ message: 'Username and password are required' });
     const existing = await Admin.findOne({ username: username.trim().toLowerCase() });
     if (existing) return res.status(400).json({ message: 'Username already exists' });
 
-    const newAdmin = await Admin.create({ username, password });
+    const newAdmin = await Admin.create({ 
+      username, 
+      password,
+      role: role || 'superadmin',
+      election_id: role === 'subadmin' ? election_id : null
+    });
     res.status(201).json({ message: 'Admin created successfully', admin: { _id: newAdmin._id, username: newAdmin.username } });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -103,6 +112,7 @@ exports.createAdmin = async (req, res) => {
 
 exports.deleteAdmin = async (req, res) => {
   try {
+    if (req.session.role === 'subadmin') return res.status(403).json({ message: 'Forbidden' });
     const { id } = req.params;
     const adminCount = await Admin.countDocuments();
     if (adminCount <= 1) return res.status(400).json({ message: 'Cannot delete the last remaining admin account' });
@@ -118,7 +128,11 @@ exports.deleteAdmin = async (req, res) => {
 // --- Elections ---
 exports.getElections = async (req, res) => {
   try {
-    const elections = await Election.find().sort({ created_at: -1 });
+    let query = {};
+    if (req.session.role === 'subadmin' && req.session.election_id) {
+      query = { _id: req.session.election_id };
+    }
+    const elections = await Election.find(query).sort({ created_at: -1 });
     res.json(elections);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -127,6 +141,9 @@ exports.getElections = async (req, res) => {
 
 exports.getElectionById = async (req, res) => {
   try {
+    if (req.session.role === 'subadmin' && req.session.election_id && req.session.election_id.toString() !== req.params.id) {
+       return res.status(403).json({ message: 'Unauthorized access to this election' });
+    }
     const election = await Election.findById(req.params.id);
     if (!election) return res.status(404).json({ message: 'Election not found' });
     res.json(election);
@@ -137,6 +154,7 @@ exports.getElectionById = async (req, res) => {
 
 exports.createElection = async (req, res) => {
   try {
+    if (req.session.role === 'subadmin') return res.status(403).json({ message: 'Forbidden' });
     const { title } = req.body;
     if (!title) return res.status(400).json({ message: 'Title is required' });
     const election = await Election.create({ title });
@@ -148,6 +166,9 @@ exports.createElection = async (req, res) => {
 
 exports.updateElection = async (req, res) => {
   try {
+    if (req.session.role === 'subadmin' && req.session.election_id && req.session.election_id.toString() !== req.params.id) {
+       return res.status(403).json({ message: 'Forbidden' });
+    }
     const { title, start_time, end_time, is_published } = req.body;
     const election = await Election.findByIdAndUpdate(req.params.id, { title, start_time, end_time, is_published }, { returnDocument: 'after' });
     if (!election) return res.status(404).json({ message: 'Election not found' });
@@ -159,6 +180,7 @@ exports.updateElection = async (req, res) => {
 
 exports.deleteElection = async (req, res) => {
   try {
+    if (req.session.role === 'subadmin') return res.status(403).json({ message: 'Forbidden' });
     const election_id = req.params.id;
     await Position.deleteMany({ election_id });
     
@@ -183,6 +205,9 @@ exports.deleteElection = async (req, res) => {
 exports.getPositions = async (req, res) => {
   try {
     const { election_id } = req.query;
+    if (req.session.role === 'subadmin' && req.session.election_id && req.session.election_id.toString() !== election_id) {
+       return res.status(403).json({ message: 'Forbidden' });
+    }
     if (!election_id) return res.status(400).json({ message: 'election_id is required' });
     const positions = await Position.find({ election_id }).sort({ order: 1 });
     res.json(positions);
@@ -194,6 +219,9 @@ exports.getPositions = async (req, res) => {
 exports.createPosition = async (req, res) => {
   try {
     const { election_id, title, order } = req.body;
+    if (req.session.role === 'subadmin' && req.session.election_id && req.session.election_id.toString() !== election_id) {
+       return res.status(403).json({ message: 'Forbidden' });
+    }
     if (!election_id) return res.status(400).json({ message: 'election_id is required' });
     const position = await Position.create({ election_id, title, order });
     res.status(201).json(position);
@@ -233,6 +261,9 @@ exports.deletePosition = async (req, res) => {
 exports.getCandidates = async (req, res) => {
   try {
     const { election_id } = req.query;
+    if (req.session.role === 'subadmin' && req.session.election_id && req.session.election_id.toString() !== election_id) {
+       return res.status(403).json({ message: 'Forbidden' });
+    }
     if (!election_id) return res.status(400).json({ message: 'election_id is required' });
     const candidates = await Candidate.find({ election_id }).populate('position_id', 'title');
     res.json(candidates);
@@ -244,6 +275,9 @@ exports.getCandidates = async (req, res) => {
 exports.createCandidate = async (req, res) => {
   try {
     const { election_id, position_id, name } = req.body;
+    if (req.session.role === 'subadmin' && req.session.election_id && req.session.election_id.toString() !== election_id) {
+       return res.status(403).json({ message: 'Forbidden' });
+    }
     if (!election_id || !position_id) return res.status(400).json({ message: 'election_id and position_id are required' });
     
     let image_url = null;
@@ -291,6 +325,9 @@ exports.deleteCandidate = async (req, res) => {
 exports.deleteAllCandidates = async (req, res) => {
   try {
     const { election_id } = req.query;
+    if (req.session.role === 'subadmin' && req.session.election_id && req.session.election_id.toString() !== election_id) {
+       return res.status(403).json({ message: 'Forbidden' });
+    }
     if (!election_id) return res.status(400).json({ message: 'election_id is required' });
     
     const candidates = await Candidate.find({ election_id });
@@ -308,6 +345,9 @@ exports.deleteAllCandidates = async (req, res) => {
 exports.getVoters = async (req, res) => {
   try {
     const { election_id } = req.query;
+    if (req.session.role === 'subadmin' && req.session.election_id && req.session.election_id.toString() !== election_id) {
+       return res.status(403).json({ message: 'Forbidden' });
+    }
     if (!election_id) return res.status(400).json({ message: 'election_id is required' });
     const voters = await Voter.find({ election_id }).sort({ full_name: 1 });
     res.json(voters);
@@ -319,6 +359,9 @@ exports.getVoters = async (req, res) => {
 exports.addVoter = async (req, res) => {
   try {
     const { election_id, full_name } = req.body;
+    if (req.session.role === 'subadmin' && req.session.election_id && req.session.election_id.toString() !== election_id) {
+       return res.status(403).json({ message: 'Forbidden' });
+    }
     if (!election_id) return res.status(400).json({ message: 'election_id is required' });
     const voter = await Voter.create({ election_id, full_name });
     res.status(201).json(voter);
@@ -331,6 +374,9 @@ exports.addVoter = async (req, res) => {
 exports.addVotersBulk = async (req, res) => {
   try {
     const { election_id, voters } = req.body;
+    if (req.session.role === 'subadmin' && req.session.election_id && req.session.election_id.toString() !== election_id) {
+       return res.status(403).json({ message: 'Forbidden' });
+    }
     if (!election_id) return res.status(400).json({ message: 'election_id is required' });
     if (!Array.isArray(voters)) return res.status(400).json({ message: 'Must provide an array of names' });
     
@@ -361,6 +407,9 @@ exports.deleteVoter = async (req, res) => {
 exports.getStats = async (req, res) => {
   try {
     const { election_id } = req.query;
+    if (req.session.role === 'subadmin' && req.session.election_id && req.session.election_id.toString() !== election_id) {
+       return res.status(403).json({ message: 'Forbidden' });
+    }
     if (!election_id) return res.status(400).json({ message: 'election_id is required' });
     const totalVoters = await Voter.countDocuments({ election_id });
     const votedCount = await Voter.countDocuments({ election_id, has_voted: true });
