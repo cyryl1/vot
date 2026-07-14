@@ -11,6 +11,7 @@ function Ballot() {
   const [error, setError] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [electionTitle, setElectionTitle] = useState('');
+  const [zoomedImage, setZoomedImage] = useState(null);
   const navigate = useNavigate();
 
   const voterId = sessionStorage.getItem('voterId');
@@ -105,6 +106,7 @@ function Ballot() {
                       src={candidate.image_url}
                       alt={candidate.name}
                       className="candidate-img"
+                      onClick={(e) => { e.stopPropagation(); setZoomedImage(candidate.image_url); }}
                     />
                   ) : (
                     <div className="candidate-img" style={{
@@ -185,6 +187,16 @@ function Ballot() {
                 {submitting ? <><span className="loader" style={{ marginRight: '8px', width: '16px', height: '16px' }}></span> Submitting...</> : 'Confirm & Submit'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Zoomed Image Modal */}
+      {zoomedImage && (
+        <div className="modal-overlay" style={{ zIndex: 9999, display: 'flex', flexDirection: 'column' }} onClick={() => setZoomedImage(null)}>
+          <div style={{ position: 'relative', maxWidth: '90%', maxHeight: '90%', display: 'flex', justifyContent: 'center', alignItems: 'center' }} onClick={e => e.stopPropagation()}>
+            <img src={zoomedImage} style={{ maxWidth: '100%', maxHeight: '85vh', objectFit: 'contain', borderRadius: '12px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }} alt="Full screen candidate" />
+            <span className="close-modal" style={{ position: 'absolute', top: '-40px', right: 0, color: 'white', fontSize: '2.5rem', fontWeight: 300 }} onClick={() => setZoomedImage(null)}>&times;</span>
           </div>
         </div>
       )}

@@ -9,6 +9,7 @@ function ElectionsList() {
   const [elections, setElections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [role, setRole] = useState('superadmin');
   
   const [showCreate, setShowCreate] = useState(false);
   const [title, setTitle] = useState('');
@@ -24,6 +25,7 @@ function ElectionsList() {
         if (!res.data.authenticated) {
           navigate('/admin/login');
         } else {
+          setRole(res.data.role);
           fetchElections();
         }
       } catch (err) {
@@ -96,12 +98,18 @@ function ElectionsList() {
       <main className="container" style={{ flex: 1, paddingTop: '3rem' }}>
         {error && <div className="alert alert-error">{error}</div>}
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', gap: '1rem' }}>
-          <h2 style={{ margin: 0, fontSize: '1.25rem' }}>Manage Elections</h2>
-          <button className="btn btn-primary" style={{ width: 'auto', fontSize: '0.85rem', padding: '0.6rem 1rem', whiteSpace: 'nowrap' }} onClick={() => setShowCreate(!showCreate)}>
-            {showCreate ? 'Cancel' : '+ New Election'}
-          </button>
-        </div>
+        {role === 'superadmin' ? (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', gap: '1rem' }}>
+            <h2 style={{ margin: 0, fontSize: '1.25rem' }}>Manage Elections</h2>
+            <button className="btn btn-primary" style={{ width: 'auto', fontSize: '0.85rem', padding: '0.6rem 1rem', whiteSpace: 'nowrap' }} onClick={() => setShowCreate(!showCreate)}>
+              {showCreate ? 'Cancel' : '+ New Election'}
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', gap: '1rem' }}>
+            <h2 style={{ margin: 0, fontSize: '1.25rem' }}>Your Election</h2>
+          </div>
+        )}
 
         {showCreate && (
           <div className="glass-card" style={{ marginBottom: '2rem' }}>
@@ -121,6 +129,7 @@ function ElectionsList() {
             <ElectionCard 
               key={election._id} 
               election={election} 
+              role={role}
               onDelete={() => setDeleteId(election._id)} 
               onClick={() => navigate(`/admin/elections/${election._id}`)}
             />
@@ -143,7 +152,7 @@ function ElectionsList() {
   );
 }
 
-function ElectionCard({ election, onDelete, onClick }) {
+function ElectionCard({ election, role, onDelete, onClick }) {
   const [timeLeft, setTimeLeft] = useState('');
   const [status, setStatus] = useState(''); // pending, active, ended
 
@@ -204,13 +213,15 @@ function ElectionCard({ election, onDelete, onClick }) {
         <span style={{ fontSize: '0.85rem', background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: '4px' }}>
           Code: {election.election_code}
         </span>
-        <button 
-          className="btn btn-danger action-btn" 
-          style={{ margin: 0, padding: '0.4rem 0.8rem' }}
-          onClick={(e) => { e.stopPropagation(); onDelete(); }}
-        >
-          Delete
-        </button>
+        {role === 'superadmin' && (
+          <button 
+            className="btn btn-danger action-btn" 
+            style={{ margin: 0, padding: '0.4rem 0.8rem' }}
+            onClick={(e) => { e.stopPropagation(); onDelete(); }}
+          >
+            Delete
+          </button>
+        )}
       </div>
     </div>
   );

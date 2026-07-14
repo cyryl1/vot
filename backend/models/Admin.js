@@ -13,6 +13,16 @@ const adminSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  role: {
+    type: String,
+    enum: ['superadmin', 'subadmin'],
+    default: 'superadmin'
+  },
+  election_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Election',
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now,
